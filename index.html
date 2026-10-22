@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Team Showcase - 3D Cube</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* CSS Variables for Dynamic 3D Dimensions */
+    :root {
+      --cube-size: 320px;
+      --cube-half: 160px;
+    }
+
+    @media (min-width: 640px) {
+      :root {
+        --cube-size: 380px;
+        --cube-half: 190px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      :root {
+        --cube-size: 440px;
+        --cube-half: 220px;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 3D Scene Container */
+    .viewport-3d {
+      perspective: 1200px;
+      perspective-origin: 50% 50%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .viewport-3d:active {
+      cursor: grabbing;
+    }
+
+    /* The Rotating Cube Object */
+    .cube-object {
+      width: var(--cube-size);
+      height: var(--cube-size);
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Common Glossy White Face Styling */
+    .cube-face {
+      position: absolute;
+      width: var(--cube-size);
+      height: var(--cube-size);
+      border-radius: 0px;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      
+      /* Glossy Pure White Material */
+      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #f9f9fb 45%, #eceef3 100%);
+      color: #0f172a;
+      
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2.2rem;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+    }
+
+    /* Subtle Glass / Gloss Reflection Overlay (No Borders) */
+    .cube-face::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      left: -60%;
+      width: 220%;
+      height: 220%;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.85) 0%,
+        rgba(255, 255, 255, 0.25) 35%,
+        rgba(255, 255, 255, 0) 65%
+      );
+      transform: rotate(25deg);
+      pointer-events: none;
+    }
+
+    /* Soft ambient surface glow on the face */
+    .cube-face::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* 3D Positioning of all 6 faces */
+    .face-front  { transform: rotateY(0deg) translateZ(var(--cube-half)); }
+    .face-right  { transform: rotateY(90deg) translateZ(var(--cube-half)); }
+    .face-back   { transform: rotateY(180deg) translateZ(var(--cube-half)); }
+    .face-left   { transform: rotateY(-90deg) translateZ(var(--cube-half)); }
+    /* Top and bottom faces hidden so only the 4 sides are visible */
+    .face-top, .face-bottom { 
+      display: none !important;
+    }
+
+    /* Clean typography details */
+    .font-heading {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Modern Scrollbar for drawer */
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="relative select-none">
+
+  <!-- Hint header / instructions (fades on interaction) -->
+  <header id="ui-hint" class="absolute top-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-opacity duration-700 text-center w-11/12 max-w-md">
+    <div class="inline-flex items-center gap-2 bg-neutral-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-800 text-xs sm:text-sm text-neutral-300 shadow-xl">
+      <svg class="w-4 h-4 text-neutral-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+      </svg>
+      <span>Swipe / Drag Left or Right to spin sides</span>
+    </div>
+  </header>
+
+  <!-- Main 3D Viewport Area -->
+  <main class="viewport-3d" id="viewport">
+    <div class="cube-object" id="cube">
+      
+      <!-- SIDE 1: FRONT (Vedant Maan - Leader) -->
+      <section class="cube-face face-front">
+        <div class="relative z-10 flex flex-col gap-2">
+          <div class="inline-block">
+            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">01 / Front</span>
+          </div>
+          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
+            Vedant Maan <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Leader)</span>
+          </h2>
+          <p class="text-base sm:text-lg font-bold text-neutral-900">
+            11th humanities
+          </p>
+        </div>
+
+        <div class="relative z-10 my-auto pt-2">
+          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
+            Hobbies:
+          </h3>
+          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Debating
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Creative Writing
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Gym &amp; Fitness
+            </li>
+          </ul>
+        </div>
+
+        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
+          <span>Humanities Dept.</span>
+          <span>Team Profile</span>
+        </div>
+      </section>
+
+      <!-- SIDE 2: RIGHT (Vansh - Member) -->
+      <section class="cube-face face-right">
+        <div class="relative z-10 flex flex-col gap-2">
+          <div class="inline-block">
+            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">02 / Right</span>
+          </div>
+          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
+            Vansh <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Member)</span>
+          </h2>
+          <p class="text-base sm:text-lg font-bold text-neutral-900">
+            11th humanities
+          </p>
+        </div>
+
+        <div class="relative z-10 my-auto pt-2">
+          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
+            Hobbies:
+          </h3>
+          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Football
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Gaming
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Graphic Design
+            </li>
+          </ul>
+        </div>
+
+        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
+          <span>Humanities Dept.</span>
+          <span>Team Profile</span>
+        </div>
+      </section>
+
+      <!-- SIDE 3: BACK (Nitin Nain - Member) -->
+      <section class="cube-face face-back">
+        <div class="relative z-10 flex flex-col gap-2">
+          <div class="inline-block">
+            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">03 / Back</span>
+          </div>
+          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
+            Nitin Nain <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Member)</span>
+          </h2>
+          <p class="text-base sm:text-lg font-bold text-neutral-900">
+            11th humanities
+          </p>
+        </div>
+
+        <div class="relative z-10 my-auto pt-2">
+          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
+            Hobbies:
+          </h3>
+          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Basketball
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Music Production
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Photography
+            </li>
+          </ul>
+        </div>
+
+        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
+          <span>Humanities Dept.</span>
+          <span>Team Profile</span>
+        </div>
+      </section>
+
+      <!-- SIDE 4: LEFT (Yash Thakran - Member) -->
+      <section class="cube-face face-left">
+        <div class="relative z-10 flex flex-col gap-2">
+          <div class="inline-block">
+            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">04 / Left</span>
+          </div>
+          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
+            Yash Thakran <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Member)</span>
+          </h2>
+          <p class="text-base sm:text-lg font-bold text-neutral-900">
+            11th humanities
+          </p>
+        </div>
+
+        <div class="relative z-10 my-auto pt-2">
+          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
+            Hobbies:
+          </h3>
+          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Reading Geopolitics
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Swimming
+            </li>
+            <li class="flex items-center gap-2 font-normal">
+              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+              Video Editing
+            </li>
+          </ul>
+        </div>
+
+        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
+          <span>Humanities Dept.</span>
+          <span>Team Profile</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Bottom-Right Corner: Files Button & Floating Hub -->
+  <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+    
+    <!-- Files Drawer Menu -->
+    <div id="files-menu" class="hidden opacity-0 translate-y-3 transition-all duration-300 ease-out mb-3 w-72 sm:w-80 bg-neutral-950/90 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-2xl p-4 overflow-hidden">
+      <div class="flex items-center justify-between pb-3 mb-2 border-b border-neutral-800">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+          </svg>
+          <span class="text-sm font-bold text-white tracking-wide">Project Files</span>
+        </div>
+        <button id="close-files-btn" class="text-neutral-400 hover:text-white p-1 rounded-lg transition-colors" title="Close">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-1.5 max-h-64 overflow-y-auto custom-scroll pr-1 text-sm">
+        
+        <!-- Primary Project File: aiproject.pdf -->
+        <a href="aiproject.pdf" target="_blank" rel="noopener noreferrer" 
+           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 hover:border-neutral-500 transition-all text-neutral-200">
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="text-red-400 text-xs font-bold bg-red-950/60 px-1.5 py-0.5 rounded border border-red-800/50">PDF</span>
+            <span class="truncate font-semibold text-white group-hover:text-neutral-100">aiproject.pdf</span>
+          </div>
+          <svg class="w-4 h-4 text-neutral-400 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </a>
+
+        <!-- Additional Reference Files -->
+        <a href="https://docs.google.com" target="_blank" rel="noopener noreferrer" 
+           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-800/80 hover:border-neutral-700 transition-all text-neutral-200">
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="text-blue-400 text-xs font-bold bg-blue-950/50 px-1.5 py-0.5 rounded border border-blue-900/40">DOC</span>
+            <span class="truncate font-medium group-hover:text-white">Research Notes.docx</span>
+          </div>
+          <svg class="w-3.5 h-3.5 text-neutral-500 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </a>
+
+        <a href="https://slides.google.com" target="_blank" rel="noopener noreferrer" 
+           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-800/80 hover:border-neutral-700 transition-all text-neutral-200">
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="text-amber-400 text-xs font-bold bg-amber-950/50 px-1.5 py-0.5 rounded border border-amber-900/40">PPT</span>
+            <span class="truncate font-medium group-hover:text-white">Team Presentation.pptx</span>
+          </div>
+          <svg class="w-3.5 h-3.5 text-neutral-500 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </a>
+
+      </div>
+      
+      <p class="text-[10px] text-neutral-500 mt-3 text-center">Clicking opens directly in a new tab</p>
+           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-800/80 hover:border-neutral-700 transition-all text-neutral-200">
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="text-emerald-400 text-xs font-bold bg-emerald-950/50 px-1.5 py-0.5 rounded border border-emerald-900/40">SRC</span>
+            <span class="truncate font-medium group-hover:text-white">Source Repository</span>
+          </div>
+          <svg class="w-3.5 h-3.5 text-neutral-500 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </a>
+
+      </div>
+      
+      <p class="text-[10px] text-neutral-500 mt-3 text-center">Clicking any file opens directly in a new tab</p>
+    </div>
+
+    <!-- Toggle Floating Button -->
+    <button id="files-toggle-btn" 
+            class="flex items-center gap-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-medium px-4 py-3 rounded-full border border-neutral-700/80 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+            aria-label="Open Files Hub">
+      <div class="relative flex items-center justify-center">
+        <svg class="w-5 h-5 text-neutral-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-white"></span>
+      </div>
+      <span class="text-sm font-semibold tracking-wide">Files</span>
+    </button>
+  </div>
+
+  <!-- Bottom-Left Quick Reset Button (Optional Convenience) -->
+  <div class="fixed bottom-6 left-6 z-30">
+    <button id="reset-cube-btn" class="bg-neutral-950/70 backdrop-blur-md text-neutral-400 hover:text-white border border-neutral-800 px-3.5 py-2 rounded-full text-xs transition-all hover:border-neutral-700">
+      Reset View
+    </button>
+  </div>
+
+  <script>
+    /* ========================================================
+       3D CUBE LOGIC & TOUCH/MOUSE GESTURE HANDLER
+       - Horizontal (Y-axis only) spin: top/bottom faces locked out
+       - Left & Right click drag supported
+       - Mobile touch swipe supported
+       - Freezes EXACTLY at release angle
+       ======================================================== */
+    const cube = document.getElementById('cube');
+    const viewport = document.getElementById('viewport');
+    const uiHint = document.getElementById('ui-hint');
+    const resetBtn = document.getElementById('reset-cube-btn');
+
+    // Rotation strictly locked to Y-axis (Horizontal)
+    let rotY = 0;
+
+    // Interaction State
+    let isDragging = false;
+    let startX = 0;
+    let currentStartY = 0;
+
+    // Sensitivity factor for natural feel
+    const SENSITIVITY = 0.45;
+
+    // Apply strictly horizontal 3D transform (no tilt)
+    function updateCubeTransform() {
+      cube.style.transform = `rotateX(0deg) rotateY(${rotY}deg)`;
+    }
+
+    // Initialize initial angle
+    updateCubeTransform();
+
+    // Prevent default context menu on right click to allow clean right-click drag
+    window.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    // Fade out hint on first drag
+    function dismissHint() {
+      if (uiHint) {
+        uiHint.style.opacity = '0';
+        setTimeout(() => {
+          uiHint.style.display = 'none';
+        }, 700);
+      }
+    }
+
+    /* --- Pointer / Mouse / Touch Events (Horizontal Only) --- */
+
+    function handleStart(clientX) {
+      isDragging = true;
+      startX = clientX;
+      currentStartY = rotY;
+      dismissHint();
+    }
+
+    function handleMove(clientX) {
+      if (!isDragging) return;
+
+      const deltaX = clientX - startX;
+      // Only rotate along horizontal axis (left / right)
+      rotY = currentStartY + (deltaX * SENSITIVITY);
+
+      updateCubeTransform();
+    }
+
+    function handleEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      // Freezes directly at the exact released horizontal angle
+    }
+
+    // Mouse Events (Supports left click & right click)
+    viewport.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      handleStart(e.clientX);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      handleMove(e.clientX);
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        handleEnd();
+      }
+    });
+
+    // Touch Events (Mobile & iPad / Tablets)
+    viewport.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        handleStart(touch.clientX);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      handleMove(touch.clientX);
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      handleEnd();
+    });
+
+    window.addEventListener('touchcancel', () => {
+      handleEnd();
+    });
+
+    // Reset View Button
+    resetBtn.addEventListener('click', () => {
+      rotY = 0;
+      cube.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+      updateCubeTransform();
+      setTimeout(() => {
+        cube.style.transition = 'none';
+      }, 500);
+    });
+
+    /* ========================================================
+       FILES HUB POPUP TOGGLE
+       ======================================================== */
+    const filesToggleBtn = document.getElementById('files-toggle-btn');
+    const filesMenu = document.getElementById('files-menu');
+    const closeFilesBtn = document.getElementById('close-files-btn');
+    let isMenuOpen = false;
+
+    function openFilesMenu() {
+      isMenuOpen = true;
+      filesMenu.classList.remove('hidden');
+      setTimeout(() => {
+        filesMenu.classList.remove('opacity-0', 'translate-y-3');
+        filesMenu.classList.add('opacity-100', 'translate-y-0');
+      }, 10);
+    }
+
+    function closeFilesMenu() {
+      isMenuOpen = false;
+      filesMenu.classList.remove('opacity-100', 'translate-y-0');
+      filesMenu.classList.add('opacity-0', 'translate-y-3');
+      setTimeout(() => {
+        filesMenu.classList.add('hidden');
+      }, 300);
+    }
+
+    filesToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isMenuOpen) {
+        closeFilesMenu();
+      } else {
+        openFilesMenu();
+      }
+    });
+
+    closeFilesBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeFilesMenu();
+    });
+
+    // Close when tapping outside the files menu
+    window.addEventListener('click', (e) => {
+      if (isMenuOpen && !filesMenu.contains(e.target) && !filesToggleBtn.contains(e.target)) {
+        closeFilesMenu();
+      }
+    });
+  </script>
+</body>
+</html>
