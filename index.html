@@ -1,599 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Team Showcase - 3D Cube</title>
-  
-  <!-- Google Fonts: Inter -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Team Showcase</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    /* CSS Variables for Dynamic 3D Dimensions */
-    :root {
-      --cube-size: 320px;
-      --cube-half: 160px;
-    }
-
-    @media (min-width: 640px) {
-      :root {
-        --cube-size: 380px;
-        --cube-half: 190px;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      :root {
-        --cube-size: 440px;
-        --cube-half: 220px;
-      }
-    }
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    body {
-      background-color: #000000;
-      color: #ffffff;
-      font-family: 'Inter', sans-serif;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* 3D Scene Container */
-    .viewport-3d {
-      perspective: 1200px;
-      perspective-origin: 50% 50%;
+    html, body {
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
+      background-color: #050505;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       touch-action: none;
+    }
+
+    /* Luxurious Velvet Obsidian Ambient Background */
+    .scene-viewport {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at 50% 50%, #16171a 0%, #08090a 55%, #000000 100%);
+      perspective: 1200px;
       cursor: grab;
     }
 
-    .viewport-3d:active {
+    .scene-viewport:active {
       cursor: grabbing;
     }
 
-    /* The Rotating Cube Object */
-    .cube-object {
+    /* 3D Cube Container */
+    :root {
+      --cube-size: min(340px, 78vw);
+      --half-size: calc(var(--cube-size) / 2);
+    }
+
+    .cube-wrapper {
+      position: relative;
       width: var(--cube-size);
       height: var(--cube-size);
-      position: relative;
       transform-style: preserve-3d;
       will-change: transform;
     }
 
-    /* Common Glossy White Face Styling */
+    /* Cube Faces Common Styling */
     .cube-face {
       position: absolute;
       width: var(--cube-size);
       height: var(--cube-size);
-      border-radius: 0px;
-      border: none !important;
-      outline: none !important;
-      box-shadow: none !important;
-      
-      /* Glossy Pure White Material */
-      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #f9f9fb 45%, #eceef3 100%);
-      color: #0f172a;
-      
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 2.2rem;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+      background: #f8f9fa;
+      border: none;
+      outline: none;
+      backface-visibility: visible;
       overflow: hidden;
+      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.05);
     }
 
-    /* Subtle Glass / Gloss Reflection Overlay (No Borders) */
-    .cube-face::before {
-      content: '';
-      position: absolute;
-      top: -60%;
-      left: -60%;
-      width: 220%;
-      height: 220%;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.85) 0%,
-        rgba(255, 255, 255, 0.25) 35%,
-        rgba(255, 255, 255, 0) 65%
-      );
-      transform: rotate(25deg);
-      pointer-events: none;
-    }
-
-    /* Soft ambient surface glow on the face */
+    /* Dynamic Luxury Gloss / Sheen Streak */
     .cube-face::after {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9), transparent 70%);
+      inset: -50%;
+      background: linear-gradient(
+        115deg,
+        rgba(255, 255, 255, 0) 38%,
+        rgba(255, 255, 255, 0.42) 48%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0.42) 52%,
+        rgba(255, 255, 255, 0) 62%
+      );
+      transform: rotate(15deg);
       pointer-events: none;
+      opacity: 0.65;
     }
 
-    /* 3D Positioning of all 6 faces */
-    .face-front  { transform: rotateY(0deg) translateZ(var(--cube-half)); }
-    .face-right  { transform: rotateY(90deg) translateZ(var(--cube-half)); }
-    .face-back   { transform: rotateY(180deg) translateZ(var(--cube-half)); }
-    .face-left   { transform: rotateY(-90deg) translateZ(var(--cube-half)); }
-    /* Top and bottom faces hidden so only the 4 sides are visible */
-    .face-top, .face-bottom { 
-      display: none !important;
+    /* Top & Bottom: Plain Ceramic White */
+    .cube-face.top {
+      transform: rotateX(90deg) translateZ(var(--half-size));
+      background: #f0f2f5;
     }
 
-    /* Clean typography details */
-    .font-heading {
-      font-family: 'Outfit', sans-serif;
+    .cube-face.bottom {
+      transform: rotateX(-90deg) translateZ(var(--half-size));
+      background: #e4e6ea;
     }
 
-    /* Modern Scrollbar for drawer */
-    .custom-scroll::-webkit-scrollbar {
-      width: 4px;
+    /* 4 Side Cards */
+    .cube-face.front {
+      transform: rotateY(0deg) translateZ(var(--half-size));
     }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
+
+    .cube-face.right {
+      transform: rotateY(90deg) translateZ(var(--half-size));
+    }
+
+    .cube-face.back {
+      transform: rotateY(180deg) translateZ(var(--half-size));
+    }
+
+    .cube-face.left {
+      transform: rotateY(-90deg) translateZ(var(--half-size));
+    }
+
+    /* Card Content Styling */
+    .card-body {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: clamp(24px, 6vw, 36px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #111418;
+      z-index: 1;
+    }
+
+    .person-name {
+      font-size: clamp(1.28rem, 4.4vw, 1.7rem);
+      font-weight: 800;
+      color: #0a0b0d;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .person-class {
+      font-size: clamp(0.95rem, 3.2vw, 1.15rem);
+      font-weight: 700;
+      color: #3b4047;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.08);
+      margin-bottom: 22px;
+    }
+
+    .hobbies-title {
+      font-size: clamp(0.85rem, 2.7vw, 1rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #111418;
+      margin-bottom: 12px;
+    }
+
+    .hobbies-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hobbies-list li {
+      font-size: clamp(0.92rem, 3vw, 1.05rem);
+      font-weight: 400;
+      color: #4a5059;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hobbies-list li::before {
+      content: '•';
+      color: #111418;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Fixed Bottom-Right Files Button */
+    .files-anchor {
+      position: fixed;
+      right: clamp(16px, 4vw, 28px);
+      bottom: clamp(16px, 4vw, 28px);
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .files-trigger-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(22, 23, 26, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      padding: 13px 20px;
+      border-radius: 9999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .files-trigger-btn:hover {
+      background: rgba(35, 37, 42, 0.95);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+    }
+
+    .files-trigger-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Files Modal / Drawer Popup */
+    .files-menu {
+      min-width: 260px;
+      max-width: 90vw;
+      background: rgba(18, 19, 22, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      transform-origin: bottom right;
+      animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .files-menu.active {
+      display: flex;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.92) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #e6e8eb;
+      font-size: 0.92rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      transform: translateX(-3px);
+    }
+
+    .file-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: #ff4b4b;
     }
   </style>
 </head>
-<body class="relative select-none">
+<body>
 
-  <!-- Hint header / instructions (fades on interaction) -->
-  <header id="ui-hint" class="absolute top-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-opacity duration-700 text-center w-11/12 max-w-md">
-    <div class="inline-flex items-center gap-2 bg-neutral-900/80 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-800 text-xs sm:text-sm text-neutral-300 shadow-xl">
-      <svg class="w-4 h-4 text-neutral-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-      </svg>
-      <span>Swipe / Drag Left or Right to spin sides</span>
+  <div class="scene-viewport" id="viewport">
+    <div class="cube-wrapper" id="cube">
+      <!-- 1st Side: Vedant Maan -->
+      <div class="cube-face front">
+        <div class="card-body">
+          <div class="person-name">Vedant Maan (Leader)</div>
+          <div class="person-class">11th humanities</div>
+          <div class="divider"></div>
+          <div class="hobbies-title">Hobbies:</div>
+          <ul class="hobbies-list">
+            <li>Debating</li>
+            <li>Creative Writing</li>
+            <li>Gym & Fitness</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2nd Side: Vansh -->
+      <div class="cube-face right">
+        <div class="card-body">
+          <div class="person-name">Vansh (Member)</div>
+          <div class="person-class">11th humanities</div>
+          <div class="divider"></div>
+          <div class="hobbies-title">Hobbies:</div>
+          <ul class="hobbies-list">
+            <li>Football</li>
+            <li>Gaming</li>
+            <li>Graphic Design</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3rd Side: Nitin Nain -->
+      <div class="cube-face back">
+        <div class="card-body">
+          <div class="person-name">Nitin Nain (Member)</div>
+          <div class="person-class">11th humanities</div>
+          <div class="divider"></div>
+          <div class="hobbies-title">Hobbies:</div>
+          <ul class="hobbies-list">
+            <li>Basketball</li>
+            <li>Music Production</li>
+            <li>Photography</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4th Side: Yash Thakran -->
+      <div class="cube-face left">
+        <div class="card-body">
+          <div class="person-name">Yash Thakran (Member)</div>
+          <div class="person-class">11th humanities</div>
+          <div class="divider"></div>
+          <div class="hobbies-title">Hobbies:</div>
+          <ul class="hobbies-list">
+            <li>Reading Geopolitics</li>
+            <li>Swimming</li>
+            <li>Video Editing</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Plain Glossy White Caps (No Text) -->
+      <div class="cube-face top"></div>
+      <div class="cube-face bottom"></div>
     </div>
-  </header>
-
-  <!-- Main 3D Viewport Area -->
-  <main class="viewport-3d" id="viewport">
-    <div class="cube-object" id="cube">
-      
-      <!-- SIDE 1: FRONT (Vedant Maan - Leader) -->
-      <section class="cube-face face-front">
-        <div class="relative z-10 flex flex-col gap-2">
-          <div class="inline-block">
-            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">01 / Front</span>
-          </div>
-          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
-            Vedant Maan <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Leader)</span>
-          </h2>
-          <p class="text-base sm:text-lg font-bold text-neutral-900">
-            11th humanities
-          </p>
-        </div>
-
-        <div class="relative z-10 my-auto pt-2">
-          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
-            Hobbies:
-          </h3>
-          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Debating
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Creative Writing
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Gym &amp; Fitness
-            </li>
-          </ul>
-        </div>
-
-        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
-          <span>Humanities Dept.</span>
-          <span>Team Profile</span>
-        </div>
-      </section>
-
-      <!-- SIDE 2: RIGHT (Vansh - Member) -->
-      <section class="cube-face face-right">
-        <div class="relative z-10 flex flex-col gap-2">
-          <div class="inline-block">
-            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">02 / Right</span>
-          </div>
-          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
-            Vansh <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Member)</span>
-          </h2>
-          <p class="text-base sm:text-lg font-bold text-neutral-900">
-            11th humanities
-          </p>
-        </div>
-
-        <div class="relative z-10 my-auto pt-2">
-          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
-            Hobbies:
-          </h3>
-          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Football
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Gaming
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Graphic Design
-            </li>
-          </ul>
-        </div>
-
-        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
-          <span>Humanities Dept.</span>
-          <span>Team Profile</span>
-        </div>
-      </section>
-
-      <!-- SIDE 3: BACK (Nitin Nain - Member) -->
-      <section class="cube-face face-back">
-        <div class="relative z-10 flex flex-col gap-2">
-          <div class="inline-block">
-            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">03 / Back</span>
-          </div>
-          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
-            Nitin Nain <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Member)</span>
-          </h2>
-          <p class="text-base sm:text-lg font-bold text-neutral-900">
-            11th humanities
-          </p>
-        </div>
-
-        <div class="relative z-10 my-auto pt-2">
-          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
-            Hobbies:
-          </h3>
-          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Basketball
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Music Production
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Photography
-            </li>
-          </ul>
-        </div>
-
-        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
-          <span>Humanities Dept.</span>
-          <span>Team Profile</span>
-        </div>
-      </section>
-
-      <!-- SIDE 4: LEFT (Yash Thakran - Member) -->
-      <section class="cube-face face-left">
-        <div class="relative z-10 flex flex-col gap-2">
-          <div class="inline-block">
-            <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 rounded font-bold bg-neutral-900 text-white">04 / Left</span>
-          </div>
-          <h2 class="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 mt-1">
-            Yash Thakran <span class="font-bold text-neutral-700 text-xl sm:text-2xl">(Member)</span>
-          </h2>
-          <p class="text-base sm:text-lg font-bold text-neutral-900">
-            11th humanities
-          </p>
-        </div>
-
-        <div class="relative z-10 my-auto pt-2">
-          <h3 class="text-sm sm:text-base font-bold text-neutral-900 tracking-wide mb-2 uppercase">
-            Hobbies:
-          </h3>
-          <ul class="space-y-1.5 text-neutral-700 text-sm sm:text-base">
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Reading Geopolitics
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Swimming
-            </li>
-            <li class="flex items-center gap-2 font-normal">
-              <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-              Video Editing
-            </li>
-          </ul>
-        </div>
-
-        <div class="relative z-10 pt-2 border-t border-neutral-200/60 flex justify-between items-center text-[11px] text-neutral-500 font-medium">
-          <span>Humanities Dept.</span>
-          <span>Team Profile</span>
-        </div>
-      </section>
-
-    </div>
-  </main>
-
-  <!-- Bottom-Right Corner: Files Button & Floating Hub -->
-  <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end">
-    
-    <!-- Files Drawer Menu -->
-    <div id="files-menu" class="hidden opacity-0 translate-y-3 transition-all duration-300 ease-out mb-3 w-72 sm:w-80 bg-neutral-950/90 backdrop-blur-xl border border-neutral-800 rounded-2xl shadow-2xl p-4 overflow-hidden">
-      <div class="flex items-center justify-between pb-3 mb-2 border-b border-neutral-800">
-        <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-          </svg>
-          <span class="text-sm font-bold text-white tracking-wide">Project Files</span>
-        </div>
-        <button id="close-files-btn" class="text-neutral-400 hover:text-white p-1 rounded-lg transition-colors" title="Close">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-
-      <div class="space-y-1.5 max-h-64 overflow-y-auto custom-scroll pr-1 text-sm">
-        
-        <!-- Primary Project File: aiproject.pdf -->
-        <a href="aiproject.pdf" target="_blank" rel="noopener noreferrer" 
-           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 hover:border-neutral-500 transition-all text-neutral-200">
-          <div class="flex items-center gap-2.5 truncate">
-            <span class="text-red-400 text-xs font-bold bg-red-950/60 px-1.5 py-0.5 rounded border border-red-800/50">PDF</span>
-            <span class="truncate font-semibold text-white group-hover:text-neutral-100">aiproject.pdf</span>
-          </div>
-          <svg class="w-4 h-4 text-neutral-400 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-          </svg>
-        </a>
-
-        <!-- Additional Reference Files -->
-        <a href="https://docs.google.com" target="_blank" rel="noopener noreferrer" 
-           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-800/80 hover:border-neutral-700 transition-all text-neutral-200">
-          <div class="flex items-center gap-2.5 truncate">
-            <span class="text-blue-400 text-xs font-bold bg-blue-950/50 px-1.5 py-0.5 rounded border border-blue-900/40">DOC</span>
-            <span class="truncate font-medium group-hover:text-white">Research Notes.docx</span>
-          </div>
-          <svg class="w-3.5 h-3.5 text-neutral-500 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-          </svg>
-        </a>
-
-        <a href="https://slides.google.com" target="_blank" rel="noopener noreferrer" 
-           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-800/80 hover:border-neutral-700 transition-all text-neutral-200">
-          <div class="flex items-center gap-2.5 truncate">
-            <span class="text-amber-400 text-xs font-bold bg-amber-950/50 px-1.5 py-0.5 rounded border border-amber-900/40">PPT</span>
-            <span class="truncate font-medium group-hover:text-white">Team Presentation.pptx</span>
-          </div>
-          <svg class="w-3.5 h-3.5 text-neutral-500 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-          </svg>
-        </a>
-
-      </div>
-      
-      <p class="text-[10px] text-neutral-500 mt-3 text-center">Clicking opens directly in a new tab</p>
-           class="group flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-800/80 hover:border-neutral-700 transition-all text-neutral-200">
-          <div class="flex items-center gap-2.5 truncate">
-            <span class="text-emerald-400 text-xs font-bold bg-emerald-950/50 px-1.5 py-0.5 rounded border border-emerald-900/40">SRC</span>
-            <span class="truncate font-medium group-hover:text-white">Source Repository</span>
-          </div>
-          <svg class="w-3.5 h-3.5 text-neutral-500 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-          </svg>
-        </a>
-
-      </div>
-      
-      <p class="text-[10px] text-neutral-500 mt-3 text-center">Clicking any file opens directly in a new tab</p>
-    </div>
-
-    <!-- Toggle Floating Button -->
-    <button id="files-toggle-btn" 
-            class="flex items-center gap-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-medium px-4 py-3 rounded-full border border-neutral-700/80 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
-            aria-label="Open Files Hub">
-      <div class="relative flex items-center justify-center">
-        <svg class="w-5 h-5 text-neutral-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-white"></span>
-      </div>
-      <span class="text-sm font-semibold tracking-wide">Files</span>
-    </button>
   </div>
 
-  <!-- Bottom-Left Quick Reset Button (Optional Convenience) -->
-  <div class="fixed bottom-6 left-6 z-30">
-    <button id="reset-cube-btn" class="bg-neutral-950/70 backdrop-blur-md text-neutral-400 hover:text-white border border-neutral-800 px-3.5 py-2 rounded-full text-xs transition-all hover:border-neutral-700">
-      Reset View
+  <!-- Bottom Right Files Button & Drawer -->
+  <div class="files-anchor">
+    <div class="files-menu" id="filesMenu">
+      <a href="aiproject.pdf" target="_blank" rel="noopener noreferrer" class="file-item">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-1v2H7V8.5h2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5zm6.5 2c0 .83-.67 1.5-1.5 1.5H12V8.5h2.5c.83 0 1.5.67 1.5 1.5v3.5zm3.5-3.5h-1.5v1.5H19v1.5h-1.5V15H16V8.5h3.5v1.5zm-8-1.5H8.5v1h1c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm4 1.5h-1v2.5h1c.28 0 .5-.22.5-.5V10c0-.28-.22-.5-.5-.5z"/>
+        </svg>
+        <span>aiproject.pdf</span>
+      </a>
+    </div>
+    <button class="files-trigger-btn" id="filesBtn" type="button" aria-label="Open Project Files">
+      <svg viewBox="0 0 24 24">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span>Files</span>
     </button>
   </div>
 
   <script>
-    /* ========================================================
-       3D CUBE LOGIC & TOUCH/MOUSE GESTURE HANDLER
-       - Horizontal (Y-axis only) spin: top/bottom faces locked out
-       - Left & Right click drag supported
-       - Mobile touch swipe supported
-       - Freezes EXACTLY at release angle
-       ======================================================== */
-    const cube = document.getElementById('cube');
     const viewport = document.getElementById('viewport');
-    const uiHint = document.getElementById('ui-hint');
-    const resetBtn = document.getElementById('reset-cube-btn');
+    const cube = document.getElementById('cube');
+    const filesBtn = document.getElementById('filesBtn');
+    const filesMenu = document.getElementById('filesMenu');
 
-    // Rotation strictly locked to Y-axis (Horizontal)
-    let rotY = 0;
+    // Angle Configuration
+    // Clamping rotateX strictly between -16° and +16° to keep the clean isometric 3D perspective
+    const MIN_PITCH = -16;
+    const MAX_PITCH = 16;
 
-    // Interaction State
+    let rotX = -7; // Default initial subtle angle showing top face slightly
+    let rotY = 15; // Slight angle showing 3D depth on start
+
     let isDragging = false;
     let startX = 0;
-    let currentStartY = 0;
+    let startY = 0;
+    let baseRotX = rotX;
+    let baseRotY = rotY;
 
-    // Sensitivity factor for natural feel
-    const SENSITIVITY = 0.45;
-
-    // Apply strictly horizontal 3D transform (no tilt)
-    function updateCubeTransform() {
-      cube.style.transform = `rotateX(0deg) rotateY(${rotY}deg)`;
+    function applyTransform() {
+      cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
     }
 
-    // Initialize initial angle
-    updateCubeTransform();
+    applyTransform();
 
-    // Prevent default context menu on right click to allow clean right-click drag
-    window.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
-
-    // Fade out hint on first drag
-    function dismissHint() {
-      if (uiHint) {
-        uiHint.style.opacity = '0';
-        setTimeout(() => {
-          uiHint.style.display = 'none';
-        }, 700);
-      }
-    }
-
-    /* --- Pointer / Mouse / Touch Events (Horizontal Only) --- */
-
-    function handleStart(clientX) {
+    function onPointerDown(e) {
+      if (e.target.closest('.files-anchor')) return;
       isDragging = true;
-      startX = clientX;
-      currentStartY = rotY;
-      dismissHint();
+      startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      baseRotX = rotX;
+      baseRotY = rotY;
     }
 
-    function handleMove(clientX) {
+    function onPointerMove(e) {
       if (!isDragging) return;
+      const currentX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      const currentY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
 
-      const deltaX = clientX - startX;
-      // Only rotate along horizontal axis (left / right)
-      rotY = currentStartY + (deltaX * SENSITIVITY);
+      const deltaX = currentX - startX;
+      const deltaY = currentY - startY;
 
-      updateCubeTransform();
+      // Sensitivity tuning
+      const factor = 0.35;
+      
+      // Calculate new X pitch and clamp it to avoid overturning
+      let targetX = baseRotX - (deltaY * factor);
+      rotX = Math.max(MIN_PITCH, Math.min(MAX_PITCH, targetX));
+
+      // Horizontal rotation remains continuous 360 degrees
+      rotY = baseRotY + (deltaX * factor);
+
+      applyTransform();
     }
 
-    function handleEnd() {
-      if (!isDragging) return;
+    function onPointerUp() {
+      // Freeze instantly at current angle upon release
       isDragging = false;
-      // Freezes directly at the exact released horizontal angle
     }
 
-    // Mouse Events (Supports left click & right click)
-    viewport.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      handleStart(e.clientX);
-    });
+    // Pointer Events for unified Mobile & Desktop drag/swipe support
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
 
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      handleMove(e.clientX);
-    });
-
-    window.addEventListener('mouseup', (e) => {
-      if (isDragging) {
+    // Prevent context menu so right-click drag works smoothly without popup interruption
+    window.addEventListener('contextmenu', (e) => {
+      if (!e.target.closest('.files-anchor')) {
         e.preventDefault();
-        handleEnd();
       }
     });
 
-    // Touch Events (Mobile & iPad / Tablets)
-    viewport.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        handleStart(touch.clientX);
-      }
-    }, { passive: false });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!isDragging || e.touches.length !== 1) return;
-      const touch = e.touches[0];
-      handleMove(touch.clientX);
-    }, { passive: true });
-
-    window.addEventListener('touchend', () => {
-      handleEnd();
-    });
-
-    window.addEventListener('touchcancel', () => {
-      handleEnd();
-    });
-
-    // Reset View Button
-    resetBtn.addEventListener('click', () => {
-      rotY = 0;
-      cube.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
-      updateCubeTransform();
-      setTimeout(() => {
-        cube.style.transition = 'none';
-      }, 500);
-    });
-
-    /* ========================================================
-       FILES HUB POPUP TOGGLE
-       ======================================================== */
-    const filesToggleBtn = document.getElementById('files-toggle-btn');
-    const filesMenu = document.getElementById('files-menu');
-    const closeFilesBtn = document.getElementById('close-files-btn');
-    let isMenuOpen = false;
-
-    function openFilesMenu() {
-      isMenuOpen = true;
-      filesMenu.classList.remove('hidden');
-      setTimeout(() => {
-        filesMenu.classList.remove('opacity-0', 'translate-y-3');
-        filesMenu.classList.add('opacity-100', 'translate-y-0');
-      }, 10);
-    }
-
-    function closeFilesMenu() {
-      isMenuOpen = false;
-      filesMenu.classList.remove('opacity-100', 'translate-y-0');
-      filesMenu.classList.add('opacity-0', 'translate-y-3');
-      setTimeout(() => {
-        filesMenu.classList.add('hidden');
-      }, 300);
-    }
-
-    filesToggleBtn.addEventListener('click', (e) => {
+    // Files Drawer Toggle
+    filesBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (isMenuOpen) {
-        closeFilesMenu();
-      } else {
-        openFilesMenu();
-      }
+      filesMenu.classList.toggle('active');
     });
 
-    closeFilesBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeFilesMenu();
-    });
-
-    // Close when tapping outside the files menu
-    window.addEventListener('click', (e) => {
-      if (isMenuOpen && !filesMenu.contains(e.target) && !filesToggleBtn.contains(e.target)) {
-        closeFilesMenu();
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.files-anchor')) {
+        filesMenu.classList.remove('active');
       }
     });
   </script>
