@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Team Showcase</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -21,21 +18,40 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #050505;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #030304;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       touch-action: none;
     }
 
-    /* Luxurious Velvet Obsidian Ambient Background */
+    /* Luxury Dark Silk Wave Background Layer */
+    .bg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-canvas svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Ambient Spotlight & 3D Viewport */
     .scene-viewport {
       position: absolute;
       inset: 0;
+      z-index: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: radial-gradient(circle at 50% 50%, #16171a 0%, #08090a 55%, #000000 100%);
       perspective: 1200px;
       cursor: grab;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.6) 80%, rgba(0, 0, 0, 0.85) 100%);
     }
 
     .scene-viewport:active {
@@ -56,7 +72,7 @@
       will-change: transform;
     }
 
-    /* Cube Faces Common Styling */
+    /* Cube Face Common Properties */
     .cube-face {
       position: absolute;
       width: var(--cube-size);
@@ -66,10 +82,10 @@
       outline: none;
       backface-visibility: visible;
       overflow: hidden;
-      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.05);
+      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.06);
     }
 
-    /* Dynamic Luxury Gloss / Sheen Streak */
+    /* Subtle Ceramic Gloss & Light Reflection Streak */
     .cube-face::after {
       content: '';
       position: absolute;
@@ -77,17 +93,17 @@
       background: linear-gradient(
         115deg,
         rgba(255, 255, 255, 0) 38%,
-        rgba(255, 255, 255, 0.42) 48%,
-        rgba(255, 255, 255, 0.7) 50%,
-        rgba(255, 255, 255, 0.42) 52%,
+        rgba(255, 255, 255, 0.4) 48%,
+        rgba(255, 255, 255, 0.72) 50%,
+        rgba(255, 255, 255, 0.4) 52%,
         rgba(255, 255, 255, 0) 62%
       );
       transform: rotate(15deg);
       pointer-events: none;
-      opacity: 0.65;
+      opacity: 0.55;
     }
 
-    /* Top & Bottom: Plain Ceramic White */
+    /* Top & Bottom: Plain Glossy White Caps */
     .cube-face.top {
       transform: rotateX(90deg) translateZ(var(--half-size));
       background: #f0f2f5;
@@ -95,10 +111,10 @@
 
     .cube-face.bottom {
       transform: rotateX(-90deg) translateZ(var(--half-size));
-      background: #e4e6ea;
+      background: #e2e5e9;
     }
 
-    /* 4 Side Cards */
+    /* 4 Sides */
     .cube-face.front {
       transform: rotateY(0deg) translateZ(var(--half-size));
     }
@@ -200,25 +216,24 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(22, 23, 26, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(18, 19, 23, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       color: #ffffff;
       padding: 13px 20px;
       border-radius: 9999px;
       font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+      transition: all 0.2s ease;
     }
 
     .files-trigger-btn:hover {
-      background: rgba(35, 37, 42, 0.95);
-      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(30, 32, 38, 0.98);
+      border-color: rgba(255, 255, 255, 0.32);
       transform: translateY(-2px);
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
     }
 
     .files-trigger-btn svg {
@@ -235,18 +250,18 @@
     .files-menu {
       min-width: 260px;
       max-width: 90vw;
-      background: rgba(18, 19, 22, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(14, 15, 18, 0.96);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 18px;
       padding: 12px;
-      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.9);
       display: none;
       flex-direction: column;
       gap: 6px;
       transform-origin: bottom right;
-      animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .files-menu.active {
@@ -274,14 +289,14 @@
       color: #e6e8eb;
       font-size: 0.92rem;
       font-weight: 600;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.2s ease;
     }
 
     .file-item:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.25);
       color: #ffffff;
       transform: translateX(-3px);
     }
@@ -290,11 +305,47 @@
       width: 20px;
       height: 20px;
       flex-shrink: 0;
-      color: #ff4b4b;
+      color: #ff4747;
     }
   </style>
 </head>
 <body>
+
+  <!-- Luxury Silk Wave Abstract Background (Embedded HD Vector) -->
+  <div class="bg-canvas">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="silkGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#08080a" />
+          <stop offset="40%" stop-color="#141518" />
+          <stop offset="70%" stop-color="#070709" />
+          <stop offset="100%" stop-color="#020202" />
+        </linearGradient>
+        <linearGradient id="silkGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1a1c22" />
+          <stop offset="50%" stop-color="#0d0e11" />
+          <stop offset="100%" stop-color="#000000" />
+        </linearGradient>
+        <linearGradient id="waveHighlight" x1="0%" y1="50%" x2="100%" y2="50%">
+          <stop offset="0%" stop-color="#242730" stop-opacity="0.35" />
+          <stop offset="45%" stop-color="#323642" stop-opacity="0.6" />
+          <stop offset="70%" stop-color="#16181d" stop-opacity="0.2" />
+          <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+
+      <rect width="1920" height="1080" fill="#040405" />
+
+      <!-- Deep Curving Silk Folds -->
+      <path d="M-100,200 C400,50 850,550 1500,250 C1800,100 2000,180 2100,220 L2100,1200 L-100,1200 Z" fill="url(#silkGrad1)" />
+      <path d="M-50,450 C500,250 950,750 1600,420 C1850,290 2050,330 2150,380 L2150,1200 L-50,1200 Z" fill="url(#silkGrad2)" opacity="0.9" />
+      <path d="M-100,680 C350,520 800,880 1450,600 C1750,480 2000,540 2150,620 L2150,1200 L-100,1200 Z" fill="#060708" opacity="0.95" />
+      
+      <!-- Luminous Wave Highlights -->
+      <path d="M-50,448 C500,248 950,748 1600,418 C1850,288 2050,328 2150,378" fill="none" stroke="url(#waveHighlight)" stroke-width="6" />
+      <path d="M-100,198 C400,48 850,548 1500,248 C1800,98 2000,178 2100,218" fill="none" stroke="url(#waveHighlight)" stroke-width="4" opacity="0.7" />
+    </svg>
+  </div>
 
   <div class="scene-viewport" id="viewport">
     <div class="cube-wrapper" id="cube">
@@ -358,13 +409,13 @@
         </div>
       </div>
 
-      <!-- Plain Glossy White Caps (No Text) -->
+      <!-- Plain Glossy White Caps -->
       <div class="cube-face top"></div>
       <div class="cube-face bottom"></div>
     </div>
   </div>
 
-  <!-- Bottom Right Files Button & Drawer -->
+  <!-- Bottom-Right Files Button & Modal -->
   <div class="files-anchor">
     <div class="files-menu" id="filesMenu">
       <a href="aiproject.pdf" target="_blank" rel="noopener noreferrer" class="file-item">
@@ -383,18 +434,16 @@
   </div>
 
   <script>
-    const viewport = document.getElementById('viewport');
     const cube = document.getElementById('cube');
     const filesBtn = document.getElementById('filesBtn');
     const filesMenu = document.getElementById('filesMenu');
 
-    // Angle Configuration
-    // Clamping rotateX strictly between -16° and +16° to keep the clean isometric 3D perspective
+    // Angle limit clamping: Vertical angle locks between -16° and +16°
     const MIN_PITCH = -16;
     const MAX_PITCH = 16;
 
-    let rotX = -7; // Default initial subtle angle showing top face slightly
-    let rotY = 15; // Slight angle showing 3D depth on start
+    let rotX = -7;
+    let rotY = 15;
 
     let isDragging = false;
     let startX = 0;
@@ -424,39 +473,30 @@
 
       const deltaX = currentX - startX;
       const deltaY = currentY - startY;
-
-      // Sensitivity tuning
       const factor = 0.35;
       
-      // Calculate new X pitch and clamp it to avoid overturning
       let targetX = baseRotX - (deltaY * factor);
       rotX = Math.max(MIN_PITCH, Math.min(MAX_PITCH, targetX));
-
-      // Horizontal rotation remains continuous 360 degrees
       rotY = baseRotY + (deltaX * factor);
 
       applyTransform();
     }
 
     function onPointerUp() {
-      // Freeze instantly at current angle upon release
       isDragging = false;
     }
 
-    // Pointer Events for unified Mobile & Desktop drag/swipe support
     window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
 
-    // Prevent context menu so right-click drag works smoothly without popup interruption
     window.addEventListener('contextmenu', (e) => {
       if (!e.target.closest('.files-anchor')) {
         e.preventDefault();
       }
     });
 
-    // Files Drawer Toggle
     filesBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       filesMenu.classList.toggle('active');
